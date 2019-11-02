@@ -119,7 +119,7 @@ func getURLs(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	//initshortURLs()
-	if len(os.Args) > 2 {
+	if len(os.Args) > 1 {
 		arg := os.Args[1]
 		c = GetClient(arg)
 	}
