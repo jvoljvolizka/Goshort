@@ -1,6 +1,12 @@
 # Goshort
 A simple url shortener written with golang
 
+## SETUP
+
+```
+./goshort dbhostname:port
+```
+
 ## How ?
 
 * Send a post request to /URL with id and link
