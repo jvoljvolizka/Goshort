@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -20,10 +21,10 @@ type shortURL struct {
 	URL string `json:"URL"`
 }
 
-var c = GetClient()
+var c = GetClient("localhost:27017")
 
-func GetClient() *mongo.Client {
-	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+func GetClient(server string) *mongo.Client {
+	clientOptions := options.Client().ApplyURI("mongodb://" + server)
 	client, err := mongo.NewClient(clientOptions)
 	if err != nil {
 		log.Fatal(err)
@@ -78,7 +79,7 @@ func createURL(w http.ResponseWriter, r *http.Request) {
 	var newURL shortURL
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		fmt.Fprintf(w, "Hey give me a ID and URL !!!")
+		fmt.Fprintf(w, "Hey give me an ID and URL !!!")
 	}
 
 	json.Unmarshal(reqBody, &newURL)
@@ -89,7 +90,7 @@ func createURL(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusCreated)
 		json.NewEncoder(w).Encode(newURL)
 	} else {
-		fmt.Fprintf(w, "It is taken")
+		fmt.Fprintf(w, "Sorry it's already taken")
 	}
 }
 
@@ -118,6 +119,10 @@ func getURLs(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	//initshortURLs()
+	if len(os.Args) > 2 {
+		arg := os.Args[1]
+		c = GetClient(arg)
+	}
 
 	err := c.Ping(context.Background(), readpref.Primary())
 	if err != nil {
