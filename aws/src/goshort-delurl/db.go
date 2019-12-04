@@ -46,22 +46,19 @@ func getItem(urlid string) (*shortURL, error) {
 	return link, nil
 }
 
-func putItem(link *shortURL) error {
-	input := &dynamodb.PutItemInput{
+func delItem(urlid string) (string, error) {
+	input := &dynamodb.DeleteItemInput{
 		TableName: aws.String("URLs"),
-		Item: map[string]*dynamodb.AttributeValue{
+		Key: map[string]*dynamodb.AttributeValue{
 			"ID": {
-				S: aws.String(link.ID),
-			},
-			"URL": {
-				S: aws.String(link.URL),
-			},
-			"DelToken": {
-				S: aws.String(link.DelToken),
+				S: aws.String(urlid),
 			},
 		},
 	}
 
-	_, err := db.PutItem(input)
-	return err
+	_, err := db.DeleteItem(input)
+	if err != nil {
+		return "", err
+	}
+	return "Success", nil
 }

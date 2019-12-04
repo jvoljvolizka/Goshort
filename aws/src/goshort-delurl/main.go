@@ -1,11 +1,17 @@
 package main
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
+
+type delURL struct {
+	ID       string `json:"ID"`
+	DelToken string `json:"DelToken"`
+}
 
 type shortURL struct {
 	ID       string `json:"ID"`
@@ -15,9 +21,12 @@ type shortURL struct {
 
 func getUrl(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
-	path := req.Path[1:]
+	var newURL delURL
+	body := []byte(req.Body)
 
-	link, err := getItem(path)
+	err := json.Unmarshal(body, &newURL)
+
+	link, err := getItem(newURL.ID)
 
 	if err != nil {
 		return events.APIGatewayProxyResponse{
@@ -33,13 +42,25 @@ func getUrl(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, 
 		}, nil
 	}
 
-	retmap := map[string]string{
-		"Location": link.URL,
+	if newURL.DelToken != link.DelToken {
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusTeapot,
+			Body:       "wrong del token babe sorry for your existence",
+		}, nil
+	}
+
+	_, err = delItem(newURL.ID)
+
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusBadRequest,
+			Body:       err.Error(),
+		}, nil
 	}
 
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusPermanentRedirect,
-		Headers:    retmap,
+		Body:       "Are we cool yet ?",
 	}, nil
 }
 
