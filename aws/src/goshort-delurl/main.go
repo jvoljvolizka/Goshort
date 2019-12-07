@@ -14,9 +14,10 @@ type delURL struct {
 }
 
 type shortURL struct {
-	ID       string `json:"ID"`
-	URL      string `json:"URL"`
-	DelToken string `json:"DelToken"`
+	ID            string `json:"ID"`
+	URL           string `json:"URL"`
+	DelToken      string `json:"DelToken"`
+	MaxClickCount string `json:"MaxClick"`
 }
 
 func getUrl(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {

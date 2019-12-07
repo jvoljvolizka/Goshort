@@ -59,9 +59,29 @@ func putItem(link *shortURL) error {
 			"DelToken": {
 				S: aws.String(link.DelToken),
 			},
+			"MaxClick": {
+				S: aws.String(link.MaxClickCount),
+			},
 		},
 	}
 
 	_, err := db.PutItem(input)
 	return err
+}
+
+func delItem(urlid string) (string, error) {
+	input := &dynamodb.DeleteItemInput{
+		TableName: aws.String("URLs"),
+		Key: map[string]*dynamodb.AttributeValue{
+			"ID": {
+				S: aws.String(urlid),
+			},
+		},
+	}
+
+	_, err := db.DeleteItem(input)
+	if err != nil {
+		return "", err
+	}
+	return "Success", nil
 }

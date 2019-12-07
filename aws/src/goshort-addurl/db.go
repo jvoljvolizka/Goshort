@@ -59,6 +59,9 @@ func putItem(link *shortURL) error {
 			"DelToken": {
 				S: aws.String(link.DelToken),
 			},
+			"MaxClick": {
+				S: aws.String(link.MaxClickCount),
+			},
 		},
 	}
 

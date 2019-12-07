@@ -9,9 +9,10 @@ import (
 )
 
 type shortURL struct {
-	ID       string `json:"ID"`
-	URL      string `json:"URL"`
-	DelToken string `json:"DelToken"`
+	ID            string `json:"ID"`
+	URL           string `json:"URL"`
+	DelToken      string `json:"DelToken"`
+	MaxClickCount string `json:"MaxClick"`
 }
 
 func addUrl(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
@@ -34,6 +35,17 @@ func addUrl(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, 
 			StatusCode: http.StatusBadRequest,
 			Body:       "id already exists",
 		}, nil
+	}
+
+	if newURL.DelToken == "" {
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusBadRequest,
+			Body:       "DelToken can't be empty",
+		}, nil
+	}
+
+	if newURL.MaxClickCount == "" {
+		newURL.MaxClickCount = "null"
 	}
 
 	err = putItem(&newURL)
